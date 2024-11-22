@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Route, Routes, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-function App() {
+import Homepage from "./Pages/Homepage/Homepage";
+import Loginpage from "./Pages/Loginpage/Loginpage";
+import Header from "./Components/Header/Header";
+import Footer from "./Components/Footer/Footer";
+import Userpage from "./Pages/Userpage/Userpage";
+import Errorpage from "./Pages/Errorpage/Errorpage";
+import "./designs/css/App.css";
+
+export default function App() {
+  const isConnected = useSelector((state) => state.auth.isConnected);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="Login" element={<Loginpage />} />
+        <Route
+          path="Userpage"
+          element={isConnected ? <Userpage /> : <Navigate to="/Login" />}
+        />
+        <Route path="*" element={<Errorpage />} />
+      </Routes>
+      <Footer />
     </div>
   );
 }
-
-export default App;
