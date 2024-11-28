@@ -9,4 +9,4 @@ export default function FeatureItem({iconUrl, title, text}) {
     <p>{text}</p>
   </div>
   )
-}
+} // 

@@ -12,11 +12,11 @@ function User() {
   const token = useSelector((state) => state.auth.token);
   const { username, firstname, lastname } = useSelector(
     (state) => state.user.userData
-  );
+  ); // Get the username from the Redux store using useSelector hook and destructuring the userData object to get the username, firstname, and lastname
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [newUsername, setNewUsername] = useState("");
-  const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false); // State to keep track of whether the user is editing their username or not
+  const [newUsername, setNewUsername] = useState(""); // State to store the new username entered by the user
+  const [error, setError] = useState(""); // State to store any error messages
 
   const toggleEditing = () => setIsEditing((prev) => !prev);
 
