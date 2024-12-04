@@ -31,7 +31,7 @@ function User() {
     setError("");
     try {
       const response = await fetch(
-        "http://localhost:3001/api/v1/user/profile",
+        "http://localhost:3005/api/v1/user/profile",
         {
           method: "PUT",
           headers: {

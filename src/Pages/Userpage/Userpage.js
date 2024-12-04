@@ -15,7 +15,7 @@ function UserProfile() {
       const userData = async () => {
         try {
           const response = await fetch(
-            "http://localhost:3001/api/v1/user/profile",
+            "http://localhost:3005/api/v1/user/profile",
             {
               method: "POST",
               headers: {
