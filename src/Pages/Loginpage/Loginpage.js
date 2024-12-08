@@ -1,22 +1,24 @@
-import React from 'react';
-import Loginform from '../../Components/Loginform/Loginform';
+import Header from '../../components/header/Header'
+import Footer from '../../components/footer/Footer'
+import Formulaire from '../../components/loginform/Loginform'
 
-
-
-
-/* Login page */
-function Login () {
-    return (
-        <div className='signin-page'>
-            <main className='bg-dark'>
-            
-                {/* Returns form component */}
-                < Loginform />
-            </main>
-            
-        </div>
-        
-    )
+/**
+ * The Connexion Page
+ * with header,
+ * form to connect at your personnal espace
+ * and footer of Argent Bank
+ * @component
+ */
+function Connexion () {
+  return (
+    <div className='connexion'>
+      <Header />
+      <main>
+        <Formulaire />
+      </main>
+      <Footer />
+    </div>
+  )
 }
 
-export default Login;
+export default Connexion

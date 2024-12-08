@@ -1,6 +1,6 @@
 import React from "react";
-import Banner from "../../Components/banner/Banner";
-import FeatureItems from "../../Components/Featureitems/Featureitems";
+import Banner from "../../components/banner/Banner";
+import FeatureItems from "../../components/featureitems/Featureitems";
 
 // Features Icon
 import Iconmoney from "../../designs/img/icon-money.webp";

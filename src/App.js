@@ -2,12 +2,12 @@ import React from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-import Homepage from "./Pages/Homepage/Homepage";
-import Loginpage from "./Pages/Loginpage/Loginpage";
-import Header from "./Components/Header/Header";
-import Footer from "./Components/Footer/Footer";
-import Userpage from "./Pages/Userpage/Userpage";
-import Errorpage from "./Pages/Errorpage/Errorpage";
+import Homepage from "./pages/homepage/Homepage";
+import Loginpage from "./pages/loginpage/Loginpage";
+import Header from "./components/header/Header";
+import Footer from "./components/footer/Footer";
+import Userpage from "./pages/userpage/Userpage";
+import Errorpage from "./pages/errorpage/Errorpage";
 import "./designs/css/App.css";
 
 export default function App() {
