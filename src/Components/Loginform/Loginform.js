@@ -1,126 +1,104 @@
-import { useNavigate } from 'react-router-dom'
-import { login } from '../../redux/action'
-import store from '../../redux/store'
-import { useSelector } from 'react-redux'
-import { useEffect } from 'react'
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { loginFailed, loginSuccess } from "../../redux/Authactions.js";
 
+const ValidEmail = (email) => {
+  const regex = /^\S+@\S+\.\S+$/;
+  return regex.test(email);
+};
 
-function Loginform () {
-  const navigate = useNavigate()
-  const statutReq = useSelector(state => state.status)
-  let rememberMe = document.getElementById('remember-me')
-  let email = document.getElementById('email')
-  let password = document.getElementById('password')
-  let form = document.getElementsByTagName('form')[0]
-  let divInputUsername = document.getElementsByClassName('input-wrapper')[0]
-  useEffect(() => {
-    if (statutReq === 'void') {
-      recupererSession()
-    }
-    if (statutReq === 'connecte') {
-      rememberMe = document.getElementById('remember-me')
-      if (rememberMe.checked) {
-        sauvegarderSession()
-      } else {
-        supprimerSession()
-      }
-      navigate('/Profile')
-    }
-    if (statutReq === 'error') {
-      form = document.getElementsByTagName('form')[0]
-      let pError = document.getElementsByClassName('error')[0]
-      if (pError === undefined) {
-        pError = document.createElement('p')
-        pError.classList.add('error')
-        pError.textContent = 'Invalid username or password'
-        form.appendChild(pError)
-      }
-    }
-  }, [statutReq, navigate])
+const ValidPassword = (password) => {
+  const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{3,}$/;
+  return regex.test(password);
+};
 
-  function connexion (e) {
-    e.preventDefault()
-    email = document.getElementById('email')
-    password = document.getElementById('password')
-    if (email !== (undefined, null) || password !== (undefined, null)) {
-      store.dispatch(login(email.value, password.value))
-    }
-  }
+function Loginform() {
+  /* Allows you to retrieve the data entered by the user in the form */
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  /* Indicates an error message if data is invalid */
+  const [errorMessage, setErrorMessage] = useState("");
 
-  function sauvegarderSession () {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  /* Asynchronous form function */
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    /* Handle error message */
+    if (!ValidEmail(email)) {
+      setErrorMessage("Invalid email adress");
+      return;
+    }
+    if (!ValidPassword(password)) {
+      setErrorMessage("Invalid password");
+      return;
+    }
     try {
-      email = document.getElementById('email')
-      password = document.getElementById('password')
-      if (email !== (undefined, null) || password !== (undefined, null)) {
-        sessionStorage.setItem('email', email.value)
-        sessionStorage.setItem('password', password.value)
-        sessionStorage.setItem('rememberMe', rememberMe.checked)
-      }
-    } catch (e) {
-      console.warn(e)
-    }
-  }
-
-  function supprimerSession () {
-    try {
-      divInputUsername = document.getElementsByClassName('input-wrapper')[0]
-      const dataList = document.getElementById('usernames')
-      if (dataList !== (undefined, null)) divInputUsername.removeChild(dataList)
-      sessionStorage.clear()
-    } catch (e) {
-      console.warn(e)
-    }
-  }
-
-  function recupererSession () {
-    try {
-      email = document.getElementById('email')
-      password = document.getElementById('password')
-      rememberMe = document.getElementById('remember-me')
-      divInputUsername = document.getElementsByClassName('input-wrapper')[0]
-      if (email !== (undefined, null) || password !== (undefined, null)) {
-        email.value = sessionStorage.getItem('email')
-        password.value = sessionStorage.getItem('password')
-        rememberMe.checked = sessionStorage.getItem('rememberMe')
-        let dataList = document.getElementById('usernames')
-        if (dataList === (undefined, null) && email.value !== '') {
-          dataList = document.createElement('datalist')
-          const optionUsername = document.createElement('option')
-          optionUsername.value = email.value
-          dataList.id = 'usernames'
-          divInputUsername.appendChild(dataList)
-          dataList.appendChild(optionUsername)
+      const response = await fetch("http://localhost:3005/api/v1/user/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const token = data.body.token;
+        dispatch(loginSuccess(token));
+        sessionStorage.setItem("token", token);
+        if (rememberMe) {
+          localStorage.setItem("token", token);
         }
+        navigate("/Userpage");
+      } else {
+        const error = "Incorrect email/password";
+        dispatch(loginFailed(error));
       }
-    } catch (e) {
-      console.warn(e)
+    } catch (error) {
+      console.error(error);
     }
-  }
+  };
+
   return (
-    <section>
-      <i className='fa fa-user-circle fa-4x sign-in-icon' />
-      <h1> Sign In </h1>
-      <form>
-        <div className='input-wrapper'>
-          <label htmlFor='username'>Username</label>
-          <input type='text' list='usernames' id='email' required />
+    <section className="sign-in-content">
+      <i className="fa fa-user-circle"></i>
+      <h2>Sign In</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="input-wrapper">
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
         </div>
-        <div className='input-wrapper'>
-          <label htmlFor='password'>Password</label>
-          <input type='password' id='password' required />
+        <div className="input-wrapper">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
         </div>
-        <div className='input-remember'>
-          <input type='checkbox' id='remember-me' />
-          <label htmlFor='remember-me'>Remember me</label>
+        <div className="input-remember">
+          <input
+            id="remember-me"
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(event) => setRememberMe(event.target.checked)}
+          />
+          <label htmlFor="remember-me">Remember me</label>
         </div>
-        <button
-          className='sign-in-button'
-          onClick={connexion}
-        > Sign In
-        </button>
+        <button className="sign-in-button">Sign In</button>
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
       </form>
     </section>
-  )
+  );
 }
 
 export default Loginform;

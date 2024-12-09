@@ -1,69 +1,112 @@
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUsername } from "../../redux/Useraction.js";
 
-import store from '../../redux/store'
-import { updateUserInfo } from '../../redux/action'
-import { useSelector } from 'react-redux'
 
-/**
- * the Information component
- * have update of first name or/and last name
- * in database
- * @component
- */
-function User () {
-  let prenom = useSelector(state => state.user.prenom)
-  let nom = useSelector(state => state.user.nom)
+/* Function to validate username */
+const validateUsername = (name) => /^[a-zA-Z]+(?:[-']?[a-zA-Z]+)*$/.test(name);
 
-  function editData () {
-    const divInfo = document.getElementsByClassName('information')[0]
-    if (divInfo !== undefined) {
-      const button = divInfo.lastChild
-      button.style.display = 'none'
-      divInfo.firstChild.textContent = 'Welcome back'
 
-      const inputPrenom = document.createElement('input')
-      const inputNom = document.createElement('input')
-      const buttonSave = document.createElement('button')
-      const buttonCancel = document.createElement('button')
-      const divButton = document.createElement('div')
+function User() {
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
+  const { username, firstname, lastname } = useSelector(
+    (state) => state.user.userData
+  ); // Get the username from the Redux store using useSelector hook and destructuring the userData object to get the username, firstname, and lastname
 
-      divInfo.appendChild(inputPrenom)
-      divInfo.appendChild(inputNom)
-      divButton.appendChild(buttonSave)
-      divButton.appendChild(buttonCancel)
-      divInfo.appendChild(divButton)
-      inputPrenom.value = prenom
-      inputNom.value = nom
-      buttonSave.textContent = 'Save'
-      buttonCancel.textContent = 'Cancel'
-      buttonSave.classList.add('sign-in-button')
-      buttonSave.classList.add('buttonEdit')
-      buttonCancel.classList.add('sign-in-button')
-      buttonCancel.classList.add('buttonEdit')
-      buttonSave.addEventListener('click', () => {
-        if (prenom !== inputPrenom.value || nom !== inputNom.value) {
-          store.dispatch(updateUserInfo(inputPrenom.value, inputNom.value))
-          prenom = inputPrenom.value
-          nom = inputNom.value
-          buttonCancel.click()
-          alert('Change made successfuly')
-        }
-      })
-      buttonCancel.addEventListener('click', () => {
-        divInfo.removeChild(inputPrenom)
-        divInfo.removeChild(inputNom)
-        divInfo.removeChild(divButton)
-        button.style.display = 'initial'
-        divInfo.firstChild.innerHTML = 'Welcome back <br /> ' + prenom + ' ' + nom
-      })
+  const [isEditing, setIsEditing] = useState(false); // State to keep track of whether the user is editing their username or not
+  const [newUsername, setNewUsername] = useState(""); // State to store the new username entered by the user
+  const [error, setError] = useState(""); // State to store any error messages
+
+  const toggleEditing = () => setIsEditing((prev) => !prev);
+
+  const handleUsernameChange = (e) => setNewUsername(e.target.value);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateUsername(newUsername)) {
+      setError("Invalid username");
+      return;
     }
-  }
+    setError("");
+    try {
+      const response = await fetch(
+        "http://localhost:3005/api/v1/user/profile",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ userName: newUsername }),
+        }
+      );
 
+      if (response.ok) {
+        const data = await response.json();
+        dispatch(updateUsername(data.body.userName));
+        toggleEditing();
+      } else {
+        console.error("Error updating username");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+
+  
   return (
-    <div className='information'>
-      <h1> Welcome back <br /> {prenom} {nom} </h1>
-      <button onClick={(e) => { editData() }}> Edit Name </button>
+    <div className="header">
+      {isEditing ? (
+        <div>
+          <h2>Edit user info</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="edit-input">
+              <label htmlFor="username">User name:</label>
+              <input
+                type="text"
+                id="username"
+                defaultValue={username}
+                onChange={handleUsernameChange}
+              />
+            </div>
+            <div className="edit-input">
+              <label htmlFor="firstname">First name:</label>
+              <input type="text" id="firstname" value={firstname} disabled />
+            </div>
+            <div className="edit-input">
+              <label htmlFor="lastname">Last name:</label>
+              <input type="text" id="lastname" value={lastname} disabled />
+            </div>
+            <div className="buttons">
+              <button type="submit" className="edit-username-button">
+                Save
+              </button>
+              <button
+                type="button"
+                className="edit-username-button"
+                onClick={toggleEditing}
+              >
+                Cancel
+              </button>
+            </div>
+            {error && <p className="error-message">{error}</p>}
+          </form>
+        </div>
+      ) : (
+        <div>
+          <h2>
+            Welcome back
+            <br />
+            {firstname} {lastname}!
+          </h2>
+          <button className="edit-button" onClick={toggleEditing}>
+            Edit Name
+          </button>
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
-export default User
+export default User;

@@ -1,57 +1,53 @@
-import logo from "../../designs/img/argentBankLogo.webp";
-import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { deconnexion } from '../../redux/action'
-import store from '../../redux/store'
-import { useEffect } from 'react'
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Logo from "../../designs/img/argentBankLogo.webp";
+import { logout } from "../../redux/Authactions.js";
 
-/**
- * an element Header HTML
- * with connected or not change visual
- * @component
- */
-function Header () {
-  const connected = useSelector(state => state.connected)
-  const prenom = useSelector(state => state.user.prenom)
+function Header() {
+  /* Updates user data on header component from state redux */
+  const isConnected = useSelector((state) => state.auth.token);
+  const username = useSelector((state) => state.user.userData.username);
 
-  useEffect(() => {
-    const divConnected = document.getElementsByClassName('connected')[0]
-    const aNotConnected = document.getElementsByClassName('notConnected')[0]
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    if (divConnected !== undefined || aNotConnected !== undefined) {
-      if (connected) {
-        divConnected.style.display = 'flex'
-        aNotConnected.style.display = 'none'
-      } else {
-        divConnected.style.display = 'none'
-        aNotConnected.style.display = 'flex'
-      }
-    }
-  }, [connected])
-
+  const logoutHandler = () => {
+    dispatch(logout());
+    sessionStorage.clear();
+    localStorage.clear();
+    navigate("/");
+  };
   return (
     <header>
+      <h1 className="sr-only"></h1>
       <nav>
-        <Link to='/'>
-          <img src={logo} alt='Argent Bank Logo' />
+        <Link to="/">
+          <img src={Logo} alt="Bank Logo" />
         </Link>
-        <Link to='/Login' className='notConnected'>
-          <i className='fa fa-2x fa-user-circle' />
-          <p> Sign In </p>
-        </Link>
-        <div className='connected'>
-          <Link to='/Profile'>
-            <i className='fa-solid fa-2x fa-circle-user' />
-            <p> {prenom} </p>
-          </Link>
-          <Link to='/' onClick={(e) => { store.dispatch(deconnexion()) }}>
-            <i className='fa-solid fa-arrow-right-from-bracket' />
-            <p> Sign out </p>
-          </Link>
-        </div>
+        {isConnected ? (
+          <div className="connected">
+            <Link to="/Userpage">
+              <i className="fa fa-user-circle" />
+              <p>{username}</p>
+            </Link>
+            <Link to="/" onClick={logoutHandler}>
+              <i className="fa fa-sign-out" />
+              <p> Sign out </p>
+            </Link>
+          </div>
+        ) : (
+          <div className="not-connected">
+            <Link to="/login">
+              <i className="fa fa-user-circle"></i>
+              <p>Sign In</p>
+            </Link>
+          </div>
+        )}
       </nav>
     </header>
-  )
+  );
 }
 
-export default Header
+export default Header;
