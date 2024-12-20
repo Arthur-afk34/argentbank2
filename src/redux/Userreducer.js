@@ -25,7 +25,7 @@ export const userReducer = (state = initialState, action) => {
         userData: {
           ...state.userData,
           username: action.payload,
-        },
+        }, // Update the username in the state 
       };
 
     default:

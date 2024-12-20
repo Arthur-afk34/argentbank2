@@ -31,7 +31,7 @@ function User() {
     setError("");
     try {
       const response = await fetch(
-        "http://localhost:3005/api/v1/user/profile",
+        "http://localhost:3001/api/v1/user/profile",
         {
           method: "PUT",
           headers: {
@@ -44,8 +44,8 @@ function User() {
 
       if (response.ok) {
         const data = await response.json();
-        dispatch(updateUsername(data.body.userName));
-        toggleEditing();
+        dispatch(updateUsername(data.body.userName)); // Update the username in the Redux store if the request is successful 
+        toggleEditing(); // Toggle the editing state to false after successful update 
       } else {
         console.error("Error updating username");
       }

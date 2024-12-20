@@ -37,7 +37,7 @@ function Loginform() {
       return;
     }
     try {
-      const response = await fetch("http://localhost:3005/api/v1/user/login", {
+      const response = await fetch("http://localhost:3001/api/v1/user/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,17 +45,17 @@ function Loginform() {
         body: JSON.stringify({ email, password }),
       });
       if (response.ok) {
-        const data = await response.json();
-        const token = data.body.token;
-        dispatch(loginSuccess(token));
-        sessionStorage.setItem("token", token);
+        const data = await response.json(); // Extract data from response
+        const token = data.body.token; // Extract token from response data object
+        dispatch(loginSuccess(token)); // Dispatch loginSuccess action with token as payload 
+        sessionStorage.setItem("token", token); // Store token in session storage for session persistence 
         if (rememberMe) {
-          localStorage.setItem("token", token);
+          localStorage.setItem("token", token); // Store token in local storage if rememberMe is checked 
         }
         navigate("/Userpage");
       } else {
         const error = "Incorrect email/password";
-        dispatch(loginFailed(error));
+        dispatch(loginFailed(error)); // Dispatch loginFailed action with error message as payload 
       }
     } catch (error) {
       console.error(error);

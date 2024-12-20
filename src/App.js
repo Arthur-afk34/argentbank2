@@ -11,7 +11,7 @@ import Errorpage from "./pages/errorpage/Errorpage";
 import "./designs/css/App.css";
 
 export default function App() {
-  const isConnected = useSelector((state) => state.auth.isConnected);
+  const isConnected = useSelector((state) => state.auth.isConnected); // vérifie si l'utilisateur est connecté ou non grâce au useSelector qui récupère la valeur de isConnected dans le state de redux et la stocke dans la variable isConnected qui sera utilisée pour conditionner l'affichage de la page Userpage 
 
   return (
     <div>

@@ -11,8 +11,8 @@ export const LOGOUT = "LOGOUT";
 /* Authentication actions */
 export const loginSuccess = (token) => {
     return {
-        type: LOGIN_SUCCESS,
-        payload: token,
+        type: LOGIN_SUCCESS, // action type 
+        payload: token, // action payload  
     }
 }
 

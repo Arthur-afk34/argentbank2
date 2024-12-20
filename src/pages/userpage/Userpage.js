@@ -6,7 +6,7 @@ import Account from "../../components/account/Account.js";
 
 /* User profile page */
 function UserProfile() {
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state) => state.auth.token); // Retrieve token from Redux store
   const dispatch = useDispatch();
 
   /* Asynchronous function that retrieves user data and updates it with useEffect */
@@ -15,7 +15,7 @@ function UserProfile() {
       const userData = async () => {
         try {
           const response = await fetch(
-            "http://localhost:3005/api/v1/user/profile",
+            "http://localhost:3001/api/v1/user/profile",
             {
               method: "POST",
               headers: {
